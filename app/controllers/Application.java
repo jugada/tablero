@@ -11,7 +11,7 @@ public class Application extends Controller {
   
     public static Result index() {
     	Logger.info("APP STARTED ");
-        return ok("Connect your players!.");
+        return ok("Game engine on.");
     }
     
     
