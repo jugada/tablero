@@ -1,0 +1,140 @@
+<html>
+<meta name="viewport" 
+  content="width=device-width, initial-scale=1.0, user-scalable=no">
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type='text/javascript'>
+
+var wsUri = "ws://192.168.0.145:9000/console"; 
+
+function connect(name) { 
+
+	try{
+		websocket = new WebSocket(wsUri+"?user="+name);
+	
+		websocket.onopen = function(evt) {
+		 onOpen(evt) 
+		};
+		websocket.onclose = function(evt) { 
+		onClose(evt) 
+		}; 
+		websocket.onmessage = function(evt) { 
+		onMessage(evt) 
+		}; 
+		websocket.onerror = function(evt) { 
+		onError(evt) 
+		};
+	} catch (e) {
+	    alert("Failed");
+	}
+
+}
+
+function onOpen(evt) { 
+
+	writeToScreen("CONNECTED"); 
+} 
+
+function onClose(evt) { 
+
+	writeToScreen("DISCONNECTED"); 
+}  
+
+function onMessage(evt) { 
+
+	writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>'); 
+	//websocket.close(); 
+}  
+
+function onError(evt) { 
+	writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data); 
+}  
+
+function doSend(message) { 
+	writeToScreen("SENT: " + message);  
+	websocket.send(message); 
+} 
+
+function writeToScreen(message) { 
+	//var pre = document.createElement("p"); pre.style.wordWrap = "break-word"; pre.innerHTML = message; 
+	//$("#output").append(pre);
+}  
+
+function send(){
+	mess = $("#message").val();
+	doSend(mess);
+}
+
+$(function(){
+
+	var button = document.getElementById('button');
+	button.addEventListener('touchstart', function(event) {
+	  doSend('{"button":"Button"}');
+	}, false);
+	button.addEventListener('touchend', function(event) {
+	  doSend('{"button":"end-Button"}');
+	}, false);
+
+	var left = document.getElementById('left');
+	left.addEventListener('touchstart', function(event) {
+	  doSend('{"button":"left"}');
+	}, false);
+	left.addEventListener('touchend', function(event) {
+	  doSend('{"button":"end-left"}');
+	}, false);
+
+	var right = document.getElementById('right');
+	right.addEventListener('touchstart', function(event) {
+	  doSend('{"button":"right"}');
+	}, false);
+	right.addEventListener('touchend', function(event) {
+	  doSend('{"button":"end-right"}');
+	}, false);
+
+	var up = document.getElementById('up');
+	up.addEventListener('touchstart', function(event) {
+	  doSend('{"button":"up"}');
+	}, false);
+	up.addEventListener('touchend', function(event) {
+	  doSend('{"button":"end-up"}');
+	}, false);
+
+	var down = document.getElementById('down');
+	down.addEventListener('touchstart', function(event) {
+	  doSend('{"button":"down"}');
+	}, false);
+	down.addEventListener('touchend', function(event) {
+	  doSend('{"button":"end-down"}');
+	}, false);
+
+});
+
+function play(){
+	
+	var username = $("#username").val();
+	connect(username);
+}
+
+</script>
+
+<body>
+
+<div id="controller">
+<div id="joystick" style="float: left; width: 100px;">
+<div id="left" style="position: absolute; background-color: rgb(0, 0, 0); height: 40px; width: 50px; margin-top: 50px;">L</div>
+<div id="right" style="position: absolute; width: 50px; background-color: rgb(0, 0, 0); height: 40px; margin-top: 50px; margin-left: 92px;">R</div>
+<div id="up" style="position: absolute; background-color: rgb(0, 0, 0); height: 50px; width: 40px; margin-left: 51px;">U</div>
+<div id="down" style="position: absolute; background-color: rgb(0, 0, 0); width: 40px; height: 50px; margin-top: 92px; margin-left: 51px;">D</div>
+</div>
+<div id="button" style="background-color: rgb(0, 128, 0); height: 40px; margin-left: 200px; position: absolute; width: 45px; text-align: center; padding-top: 16px; margin-top: 36px;">A</div>
+<div id="config" style="position:absolute; margin-top:200px;">
+<input type="textfield" id="username" />
+<input type="submit" value="Play!" onclick="play()">
+</div>
+</div>
+
+</body>
+
+
+</html>
+
+

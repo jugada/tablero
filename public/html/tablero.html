@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type='text/javascript'>
+var Game = {};
+var players = {};
+var charCount = 1;
+Game.fps = 30;
+ 
+Game.initialize = function() {
+  this.entities = [];
+  this.context = document.getElementById("gamearea").getContext("2d");
+};
+
+
+Game.draw = function(){
+  this.context.clearRect(0,0,780,720);
+  for(var i = 0; i < this.entities.length; i++){
+    this.entities[i].draw(this.context);
+  }
+};
+
+Game.update = function(){
+  $.each(this.entities, function(index, value) {
+    value.update(this.context);	
+  });
+};
+
+Game.addPlayer = function(x, y, name){
+  player = new Character(x, y);
+  Game.entities.push(player);
+  players[name] = player;
+};
+
+Game.run = (function(){
+  var loops = 0, skipTicks = 1000 / Game.fps,
+  maxFrameSkip = 10,
+  nextGameTick = (new Date).getTime();
+ 
+return function() {
+  loops = 0;
+ 
+  while ((new Date).getTime() > nextGameTick && loops < maxFrameSkip) {
+    Game.update();
+    nextGameTick += skipTicks;
+    loops++;
+  }
+ 
+  Game.draw();
+};
+})();
+
+function Character(x, y){
+  this.x = x;
+  this.y = y;
+  this.dude = new Image();
+  this.dude.src = "assets/html/dude"+charCount+".png";
+  charCount++;
+}
+
+Character.prototype.draw = function(context){
+  if(this.dude.complete){
+    context.drawImage(this.dude, this.x, this.y);
+  };
+};
+
+Character.prototype.update = function(context){
+
+}
+
+Character.prototype.moveUp = function(){
+  this.y -= 2;
+};
+Character.prototype.moveDown = function(){
+  this.y += 2;
+};
+Character.prototype.moveLeft = function(){
+  this.x -= 2;
+};
+Character.prototype.moveRight = function(){
+  this.x += 2;
+};
+
+window.onload = function(){
+  Game.initialize();
+ 
+  Game._intervalId = setInterval(Game.run, 0);
+};
+
+var wsUri = "ws://192.168.0.145:9000/console"; 
+
+function connect() { 
+
+	try{
+		websocket = new WebSocket(wsUri+"?user=TABLERO");
+	
+		websocket.onopen = function(evt) {
+		 onOpen(evt) 
+		};
+		websocket.onclose = function(evt) { 
+		onClose(evt) 
+		}; 
+		websocket.onmessage = function(evt) { 
+		onMessage(evt) 
+		}; 
+		websocket.onerror = function(evt) { 
+		onError(evt) 
+		};
+	} catch (e) {
+	    console.log("Failed");
+	}
+
+}
+
+function onOpen(evt) { 
+	console.log("CONNECTED"); 
+
+} 
+
+function onClose(evt) { 
+	console.log("DISCONNECTED"); 
+}  
+
+function onMessage(evt) { 
+	var mess = jQuery.parseJSON(evt.data);
+
+	if (mess.action == "connect"){
+
+	  Game.addPlayer(30, 30, mess.player);	
+	}
+		
+    console.log(mess);
+
+	switch (mess.move){
+		case "Button":
+		  console.log("Jump");
+		break;
+		case "left":
+		  leftInterval = setInterval(function(){players[mess.player].moveLeft()}, 10);
+		break;
+		case "end-left":
+		  clearInterval(leftInterval);
+		break;
+		case "right":
+		  rightInterval = setInterval(function(){players[mess.player].moveRight()}, 10);
+		break;
+		case "end-right":
+		  clearInterval(rightInterval);
+		break;
+		case "up":
+		  upInterval = setInterval(function(){players[mess.player].moveUp()}, 10);
+		break;
+		case "end-up":
+		  clearInterval(upInterval);
+		break;
+		case "down":
+		  downInterval = setInterval(function(){players[mess.player].moveDown()}, 10);
+		break;
+		case "end-down":
+		  clearInterval(downInterval);
+		break;
+	}
+}  
+
+function onError(evt) { 
+	console.log('ERROR: ' + evt.data); 
+}  
+
+function doSend(message) { 
+	console.log("SENT: " + message);  
+	websocket.send(message); 
+} 
+
+connect();
+</script>
+  </head>
+  <body>
+	<div>Connect your players!</div>
+    <canvas id="gamearea" width="780px" height="720px"></canvas>
+  </body>
+</html>
