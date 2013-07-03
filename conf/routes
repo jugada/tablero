@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index()
-GET     /console                    controllers.Application.console(user: String ?= null)
+GET     /console                    controllers.Application.index()
 GET     /controller                 controllers.Assets.at(path="/public", file="/html/controller.html")
 GET     /tablero                    controllers.Assets.at(path="/public", file="/html/tablero.html")
 GET     /dude.png                   controllers.Assets.at(path="/public", file="/html/dude.png")
