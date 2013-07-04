@@ -23,13 +23,13 @@ public class Application extends Controller {
      * @return
      */
     public static WebSocket<JsonNode> console(final String user) {
-    	Logger.info("Entra "+user);
+    	
         return new WebSocket<JsonNode>() {
         	
             public void onReady(WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) {
 
             	try{
-            		Logger.info("intento");
+            		
             		WebSocketModel.connect(user, in, out);
             		Logger.info("CONNECTED user "+user);
             		

@@ -15,7 +15,6 @@ Game.initialize = function() {
   this.context = document.getElementById("gamearea").getContext("2d");
 };
 
-
 Game.draw = function(){
   this.context.clearRect(0,0,780,720);
   for(var i = 0; i < this.entities.length; i++){
@@ -67,10 +66,6 @@ Character.prototype.draw = function(context){
   };
 };
 
-Character.prototype.update = function(context){
-
-}
-
 Character.prototype.moveUp = function(){
   this.y -= 2;
 };
@@ -90,7 +85,7 @@ window.onload = function(){
   Game._intervalId = setInterval(Game.run, 0);
 };
 
-var wsUri = "ws://sheltered-mesa-6085.herokuapp.com/console"; 
+var wsUri = "ws://localhost:9000/console"; 
 
 function connect() { 
 

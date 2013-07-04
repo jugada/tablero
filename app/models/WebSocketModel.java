@@ -20,13 +20,13 @@ public class WebSocketModel extends UntypedActor {
 	// Default actor.
     static ActorRef defaultSpace = Akka.system().actorOf(new Props(WebSocketModel.class));
     
-	// people connected
+	// players connected
 	static Map<String, WebSocket.Out<JsonNode>> connected = new HashMap<String, WebSocket.Out<JsonNode>>();
 		
 	// everytime a new websocket is opened we call this method to initializate the connection
 	public static void connect(final String user, WebSocket.In<JsonNode> in, WebSocket.Out<JsonNode> out) throws Exception{
 		
-		// check if the user is already connected
+		// check if the player is already connected
 		if(connected.containsKey(user)) {
 			
 			try {
@@ -37,7 +37,7 @@ public class WebSocketModel extends UntypedActor {
     	        JsonFactory factory = mapper.getJsonFactory();
     	        JsonParser jp;
     	        
-    	        jp = factory.createJsonParser("{\"error\":\"user already exists\"}");
+    	        jp = factory.createJsonParser("{\"error\":\"player already exists\"}");
     	        JsonNode actualObj;
     			actualObj = mapper.readTree(jp);
     			out.write(actualObj);
@@ -55,7 +55,7 @@ public class WebSocketModel extends UntypedActor {
 	        in.onMessage(new Callback<JsonNode>() {
 	           public void invoke(JsonNode event) throws JsonParseException, IOException {
 	        	   
-	        	   // let the actor know we received a websocket message from a user
+	        	   // let the actor know we received a websocket message from a player
 	               defaultSpace.tell(new Message(user, event), null);
 	               
 	           }
@@ -112,6 +112,7 @@ public class WebSocketModel extends UntypedActor {
 	        jp = factory.createJsonParser("{\"action\":\"control\",\"player\":\""+mess.user+"\",\"move\":\""+mess.message.get("button").asText()+"\"}");
 	        JsonNode actualObj;
 			actualObj = mapper.readTree(jp);
+			// echo back the object, this reduces latency on ios
             connected.get(mess.user).write(actualObj);
             connected.get("TABLERO").write(actualObj);
 					
